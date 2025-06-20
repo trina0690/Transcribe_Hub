@@ -1,0 +1,978 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transcription Results - TranscribeHub</title>
+<link rel="stylesheet" href="{% static 'style.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
+<style>
+    :root {
+        --primary: #3498db;
+        --primary-light: #3498db15;
+        --primary-dark: #1d4e89;
+        --secondary: #00d4ff;
+        --dark: #0b132b;
+        --grey: #7f8c8d;
+        --light-grey: #bdc3c7;
+        --light: #d6dee4;
+        --white: #ffffff;
+        --danger: #e74c3c;
+        --success: #2ecc71;
+        --warning: #f39c12;
+        --border-radius: 8px;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        --bg-color: #f8fafc;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--dark);
+        line-height: 1.6;
+    }
+
+    /* Header Styles */
+    header {
+        background-color: var(--white);
+        box-shadow: var(--shadow);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+        padding: 0 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--primary-dark);
+        font-weight: 700;
+        font-size: 1.3rem;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+        transform: translateY(-2px);
+    }
+    
+    .logo svg {
+        stroke: var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    .logo:hover svg {
+        transform: rotate(5deg);
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 1.8rem;
+    }
+
+    .nav-links a {
+        color: var(--dark);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        position: relative;
+    }
+
+    .nav-links a:hover {
+        color: var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+        width: 100%;
+    }
+
+    /* Main Layout */
+    .main-container {
+        display: flex;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        gap: 2rem;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+        width: 280px;
+        position: sticky;
+        top: 90px;
+        height: fit-content;
+        background: var(--white);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(52, 152, 219, 0.08);
+    }
+
+    .sidebar h3 {
+        color: var(--primary-dark);
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid var(--primary-light);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-menu {
+        list-style: none;
+    }
+
+    .nav-menu li {
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-menu a {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.8rem 1rem;
+        color: var(--dark);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .nav-menu a:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        transform: translateX(5px);
+    }
+
+    .nav-menu a.active {
+        background: var(--primary);
+        color: var(--white);
+    }
+
+    .nav-menu i {
+        width: 16px;
+        text-align: center;
+    }
+
+    /* Content Area */
+    .content-area {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* File Info Header - Fixed styling */
+    .file-info-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--white);
+        padding: 2.5rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        scroll-margin-top: 100px;
+        box-shadow: 0 12px 40px rgba(52, 152, 219, 0.2);
+    }
+
+    .file-info-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 30%, transparent 70%);
+        animation: float 8s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    .file-info-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .file-icon {
+        font-size: 3.5rem;
+        opacity: 0.95;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .file-details h1 {
+        font-size: 2rem;
+        margin-bottom: 1.2rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        color: var(--white);
+    }
+
+    .file-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.8rem 1.2rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        backdrop-filter: blur(15px);
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--white);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .meta-item i {
+        color: var(--white);
+        opacity: 0.9;
+    }
+
+    /* Section Styles */
+    .section {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(52, 152, 219, 0.08);
+        scroll-margin-top: 100px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--primary-light);
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .section-header i {
+        color: var(--primary);
+        font-size: 1.3rem;
+    }
+
+    /* Transcript Styles */
+    .transcript-container {
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 1rem;
+    }
+
+    .transcript-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .transcript-container::-webkit-scrollbar-track {
+        background: rgba(52, 152, 219, 0.1);
+        border-radius: 4px;
+    }
+
+    .transcript-container::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 4px;
+    }
+
+    .transcript-list {
+        list-style: none;
+    }
+
+    .transcript-item {
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        background: var(--bg-color);
+        border-radius: 12px;
+        border-left: 4px solid var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    .transcript-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.1);
+    }
+
+    .speaker-name {
+        font-weight: 700;
+        color: var(--primary-dark);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .transcript-text {
+        color: var(--dark);
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    /* Summary Content */
+    .summary-content {
+        background: var(--bg-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 5px solid var(--warning);
+    }
+
+    .summary-content p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--dark);
+        margin: 0;
+    }
+
+    /* MoM Styles */
+    .mom-content h3 {
+        color: var(--primary-dark);
+        font-size: 1.2rem;
+        margin: 1.5rem 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-light);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mom-content h3:first-child {
+        margin-top: 0;
+    }
+
+    .mom-content h3 i {
+        color: var(--primary);
+        font-size: 1rem;
+    }
+
+    /* Sentiment Analysis */
+    .sentiment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .sentiment-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--bg-color);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .sentiment-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(52, 152, 219, 0.15);
+        border-color: var(--primary);
+    }
+
+    .sentiment-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--grey);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .sentiment-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .sentiment-badge {
+        display: inline-block;
+        padding: 0.6rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    .sentiment-positive {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(46, 204, 113, 0.4));
+        color: var(--success);
+        border: 2px solid rgba(46, 204, 113, 0.5);
+    }
+
+    .sentiment-negative {
+        background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(231, 76, 60, 0.4));
+        color: var(--danger);
+        border: 2px solid rgba(231, 76, 60, 0.5);
+    }
+
+    .sentiment-neutral {
+        background: linear-gradient(135deg, rgba(127, 140, 141, 0.2), rgba(127, 140, 141, 0.4));
+        color: var(--grey);
+        border: 2px solid rgba(127, 140, 141, 0.5);
+    }
+
+    /* Speaker Statistics */
+    .speaker-stats-content {
+        background: var(--bg-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 5px solid var(--secondary);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn {
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+    }
+
+    .btn-secondary {
+        background: var(--white);
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+    }
+
+    .btn-secondary:hover {
+        background: var(--primary);
+        color: var(--white);
+        transform: translateY(-2px);
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 1024px) {
+        .main-container {
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .sidebar {
+            width: 100%;
+            position: static;
+            order: -1;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .nav-menu li {
+            margin-bottom: 0;
+        }
+
+        .nav-menu a {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .nav-links {
+            display: none;
+        }
+
+        .file-info-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .file-meta {
+            justify-content: center;
+        }
+
+        .section {
+            padding: 1.5rem;
+        }
+
+        .sentiment-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            grid-template-columns: 1fr;
+        }
+
+        .file-info-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .file-details h1 {
+            font-size: 1.6rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .main-container {
+            padding: 0.5rem;
+        }
+
+        .section {
+            padding: 1rem;
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+        }
+
+        .file-info-header {
+            padding: 1.5rem 1rem;
+        }
+
+        .file-details h1 {
+            font-size: 1.4rem;
+        }
+    }
+
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+</head>
+
+<body>
+<!-- Header Section -->
+<header>
+    <nav>
+        <a href="{% url 'index' %}" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>TranscribeHub</span>
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="#">Help</a>
+        </div>
+    </nav>
+</header>
+
+<!-- Main Container -->
+<div class="main-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <h3><i class="fas fa-list"></i> Navigation</h3>
+        <ul class="nav-menu">
+            <li><a href="#file-info" class="nav-link"><i class="fas fa-file-audio"></i> File Info</a></li>
+            <li><a href="#transcript" class="nav-link"><i class="fas fa-comments"></i> Transcript</a></li>
+            <li><a href="#summary" class="nav-link"><i class="fas fa-lightbulb"></i> Summary</a></li>
+            <li><a href="#mom" class="nav-link"><i class="fas fa-handshake"></i> Meeting Minutes</a></li>
+            <li><a href="#sentiment" class="nav-link"><i class="fas fa-chart-line"></i> Sentiment</a></li>
+            <li><a href="#speaker-stats" class="nav-link"><i class="fas fa-chart-pie"></i> Speaker Stats</a></li>
+            <li><a href="#downloads" class="nav-link"><i class="fas fa-download"></i> Downloads</a></li>
+        </ul>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="content-area">
+        <!-- File Information Header -->
+        <section id="file-info" class="file-info-header">
+            <div class="file-info-content">
+                <div class="file-icon">
+                    <i class="fas fa-file-audio"></i>
+                </div>
+                <div class="file-details">
+                    <h1>{{ filename }}</h1>
+                    <div class="file-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-weight"></i>
+                            <span>{{ filesize }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ duration }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span>{{ speakers }} speakers detected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transcript Section -->
+        <section id="transcript" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-comments"></i> Full Transcript</h2>
+            </div>
+            <div class="transcript-container">
+                <ul class="transcript-list">
+                    {% for line in transcript %}
+                        <li class="transcript-item">
+                            <span class="speaker-name">{{ line.speaker }}</span>
+                            <div class="transcript-text">{{ line.text }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section id="summary" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-lightbulb"></i> Summary</h2>
+            </div>
+            <div class="summary-content">
+                <p>{{ summary }}</p>
+            </div>
+        </section>
+
+        <section id="mom" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-handshake"></i> Minutes of Meeting</h2>
+            </div>
+            <div class="mom-content">
+
+                {% if mom.meetingDate %}
+                    <p><strong>Meeting Date:</strong> {{ mom.meetingDate }}</p>
+                {% endif %}
+
+                {% if mom.keyDecisions %}
+                    {% if mom.keyDecisions|length > 0 %}
+                        <h3><i class="fas fa-gavel"></i> Key Decisions</h3>
+                        <ul class="transcript-list">
+                            {% for decision in mom.keyDecisions %}
+                                <li class="transcript-item">{{ decision }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p><em>No key decisions recorded.</em></p>
+                    {% endif %}
+                {% endif %}
+
+                {% if mom.actionItems %}
+                    {% if mom.actionItems|length > 0 %}
+                        <h3><i class="fas fa-tasks"></i> Action Items</h3>
+                        <ul class="transcript-list">
+                            {% for item in mom.actionItems %}
+                                <li class="transcript-item">
+                                    {{ item.item }}
+                                    {% if item.person %}
+                                        — <strong>{{ item.person }}</strong>
+                                    {% elif item.assignedTo %}
+                                        — <strong>{{ item.assignedTo }}</strong>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p><em>No action items noted.</em></p>
+                    {% endif %}
+                {% endif %}
+
+                {% if mom.timestamps %}
+                    {% if mom.timestamps|length > 0 %}
+                        <h3><i class="fas fa-clock"></i> Timestamps</h3>
+                        <ul class="transcript-list">
+                            {% for ts in mom.timestamps %}
+                                <li class="transcript-item">
+                                    {% if ts.time and ts.event %}
+                                        {{ ts.time }} — {{ ts.event }}
+                                    {% else %}
+                                        {{ ts }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+
+                {% if subjectivity %}
+                    <p><strong>Subjectivity:</strong> {{ subjectivity }}</p>
+                {% endif %}
+
+            </div>
+        </section>
+
+        <!-- Sentiment Analysis Section -->
+        <section id="sentiment" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> Sentiment Analysis</h2>
+            </div>
+            <div class="sentiment-grid">
+                <div class="sentiment-item">
+                    <span class="sentiment-label">Overall Sentiment</span>
+                    <div class="sentiment-value">
+                        <span class="sentiment-badge 
+                            {% if sentiment_label == 'positive' %}sentiment-positive
+                            {% elif sentiment_label == 'negative' %}sentiment-negative
+                            {% else %}sentiment-neutral{% endif %}">
+                            {{ sentiment_label }}
+                        </span>
+                    </div>
+                </div>
+                <div class="sentiment-item">
+                    <span class="sentiment-label">Polarity</span>
+                    <div class="sentiment-value">{{ polarity }}</div>
+                </div>
+                <div class="sentiment-item">
+                    <span class="sentiment-label">Subjectivity</span>
+                    <div class="sentiment-value">{{ subjectivity }}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Speaker Statistics Section -->
+        <section id="speaker-stats" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-pie"></i> Speaker Statistics</h2>
+            </div>
+            <div class="speaker-stats-content">
+                {{ speaker_stats_html|safe }}
+            </div>
+        </section>
+          <!-- Speaker Statistics Section with Charts -->
+        <section id="speaker-stats" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-pie"></i> Speaker Statistics</h2>
+            </div>
+            
+            <!-- Statistics Summary Cards -->
+            <div class="stats-summary" id="stats-summary">
+                <!-- Will be populated by JavaScript -->
+            </div>
+          
+            
+
+        <!-- Download Section -->
+        <section id="downloads" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-download"></i> Download Results</h2>
+            </div>
+            <div class="action-buttons">
+                <a href="{% url 'download_transcript' 'txt' %}" class="btn btn-primary">
+                    <i class="fas fa-file-alt"></i> Download TXT
+                </a>
+                <a href="{% url 'download_transcript' 'csv' %}" class="btn btn-primary">
+                    <i class="fas fa-file-csv"></i> Download CSV
+                </a>
+                <a href="{% url 'download_transcript' 'srt' %}" class="btn btn-primary">
+                    <i class="fas fa-closed-captioning"></i> Download SRT
+                </a>
+                <a href="{% url 'download_results' %}" class="btn btn-primary">
+                    <i class="fas fa-chart-bar"></i> Download Analysis
+                </a>
+                <a href="{% url 'upload' %}" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i> Transcribe Another
+                </a>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const stats = JSON.parse('{{ speaker_stats_data|escapejs }}');
+
+    // Speaking Time Chart
+    const speakingCtx = document.getElementById('speakingTimeChart').getContext('2d');
+    new Chart(speakingCtx, {
+        type: 'bar',
+        data: {
+            labels: stats.labels,
+            datasets: [{
+                label: 'Speaking Time (s)',
+                data: stats.durations,
+                backgroundColor: '#4e79a7'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Speaking Time per Speaker' },
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Word Count Chart
+    const wordCtx = document.getElementById('wordCountChart').getContext('2d');
+    new Chart(wordCtx, {
+        type: 'bar',
+        data: {
+            labels: stats.labels,
+            datasets: [{
+                label: 'Word Count',
+                data: stats.word_counts,
+                backgroundColor: '#f28e2b'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Word Count per Speaker' },
+                legend: { display: false }
+            }
+        }
+    });
+
+
+// Navigation functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.section, .file-info-header');
+
+    // Handle navigation clicks
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                // Calculate offset for sticky header
+                const headerHeight = document.querySelector('header').offsetHeight;
+                const elementPosition = targetSection.offsetTop;
+                const offsetPosition = elementPosition - headerHeight - 20;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+            
+            // Update active state
+            navLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Highlight active section on scroll
+    function updateActiveNav() {
+        let current = '';
+        const headerHeight = document.querySelector('header').offsetHeight + 30;
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - headerHeight;
+            if (window.pageYOffset >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // Set initial active state
+    if (navLinks.length > 0) {
+        navLinks[0].classList.add('active');
+    }
+
+    // Update active nav on scroll with throttling
+    let ticking = false;
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateActiveNav);
+            ticking = true;
+            setTimeout(() => { ticking = false; }, 100);
+        }
+    }
+
+    window.addEventListener('scroll', requestTick);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1042 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Audio - TranscribeHub</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db; /* Vivid Sky Blue */
+            --primary-light: #3498db15;
+            --primary-dark: #1d4e89; /* Rich Deep Blue */
+            --secondary: #00d4ff; /* Electric Cyan */
+            --dark: #0b132b; /* Midnight Blue */
+            --grey: #7f8c8d; /* Muted Blue-Grey */
+            --light-grey: #bdc3c7; /* Cool Fog Blue */
+            --light: #d6dee4; /* Soft Sky Blue */
+            --white: #ffffff;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --bg-color: #f0f4f8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            padding: 0 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+        }
+        
+        .logo svg {
+            stroke: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 75%, var(--dark) 100%);
+            color: var(--white);
+            padding: 4rem 2rem; /* Reduced padding */
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 1.5rem; /* Reduced margin */
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none"/><path d="M0 50 Q 25 0, 50 50 T 100 50" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/></svg>');
+            background-size: 200px;
+            opacity: 0.7;
+            animation: waveBg 20s linear infinite;
+        }
+        
+        @keyframes waveBg {
+            0% { background-position: 0 0; }
+            100% { background-position: 400px 0; }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem; /* Slightly reduced font size */
+            margin-bottom: 1rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.02em;
+        }
+        
+        .hero p {
+            font-size: 1.25rem; /* Slightly reduced font size */
+            opacity: 0.95;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Workflow Section Styles - UPDATED */
+        .workflow-section {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .workflow-card {
+            background: linear-gradient(160deg, var(--white) 0%, var(--bg-color) 100%);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            padding: 2rem 1.5rem;
+            width: 280px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(206, 212, 218, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .workflow-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .workflow-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(52, 152, 219, 0.1) 100%);
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            transition: all 0.4s ease;
+            border: 2px solid rgba(52, 152, 219, 0.1);
+        }
+
+        .workflow-card:hover .workflow-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            border-color: transparent;
+        }
+
+        .workflow-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .workflow-card p {
+            color: var(--grey);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Upload Section - UPDATED */
+        .upload-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: relative;
+            overflow: hidden;
+            border-radius: 30px 30px 0 0;
+            margin-top: 2rem;
+        }
+
+        .upload-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none"/><path d="M0 50 Q 25 0, 50 50 T 100 50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="3"/></svg>');
+            background-size: 200px;
+            opacity: 0.7;
+            z-index: 0;
+        }
+
+        .upload-area {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            padding: 3rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 3px dashed var(--light-grey);
+            border-radius: 15px;
+            padding: 2.5rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--white) 0%, var(--bg-color) 100%);
+        }
+
+        .drop-zone.dragging {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .drop-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+        }
+
+        .browse-text {
+            font-size: 1.05rem;
+            color: var(--grey);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Processing Animation and State - NEW */
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .processing-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .processing-content {
+            background-color: var(--white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .processing-icon {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+        }
+
+        .processing-circle {
+            width: 100%;
+            height: 100%;
+            border: 6px solid var(--light-grey);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .processing-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 30%;
+        }
+
+        .wave-bar {
+            position: absolute;
+            bottom: 0;
+            width: 8%;
+            background-color: var(--primary);
+            animation: waveAnimation 1.2s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) { left: 0%; height: 40%; animation-delay: 0s; }
+        .wave-bar:nth-child(2) { left: 13%; height: 60%; animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { left: 26%; height: 80%; animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { left: 39%; height: 100%; animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { left: 52%; height: 80%; animation-delay: 0.4s; }
+        .wave-bar:nth-child(6) { left: 65%; height: 60%; animation-delay: 0.5s; }
+        .wave-bar:nth-child(7) { left: 78%; height: 40%; animation-delay: 0.6s; }
+        .wave-bar:nth-child(8) { left: 91%; height: 20%; animation-delay: 0.7s; }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes waveAnimation {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+
+        .processing-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .processing-text {
+            font-size: 1.1rem;
+            color: var(--grey);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .processing-progress {
+            width: 100%;
+            height: 10px;
+            background-color: var(--light);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            width: 0%;
+            border-radius: 5px;
+            animation: progressAnimation 30s linear forwards;
+        }
+
+        @keyframes progressAnimation {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .processing-status {
+            font-size: 0.9rem;
+            color: var(--grey);
+            font-weight: 500;
+        }
+
+        /* Form styles */
+        .form-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--light-grey);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .help-text {
+            color: var(--grey);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* File Display */
+        .file-display {
+            width: 100%;
+            background: linear-gradient(135deg, var(--light) 0%, var(--bg-color) 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease;
+            display: none; /* Hidden by default, shown with JS */
+            border: 1px solid var(--light-grey);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-right: 1.5rem;
+        }
+
+        .file-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .file-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .file-details {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--grey);
+            font-size: 0.9rem;
+        }
+
+        .remove-button {
+            background: none;
+            border: none;
+            color: var(--grey);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remove-button:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        /* Submit button */
+        .submit-button {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            padding: 1.2rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+            margin: 1.5rem auto 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-20deg);
+            transition: all 0.6s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .submit-button:hover::before {
+            left: 100%;
+        }
+
+        .supported-formats {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .format-badge {
+            background: linear-gradient(135deg, var(--light) 0%, var(--bg-color) 100%);
+            color: var(--dark);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--light-grey);
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .message.error {
+            background-color: #ffebee;
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: var(--white);
+            padding: 1.5rem 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .copyright {
+            color: var(--grey);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--grey);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Media Queries */
+        @media (max-width: 992px) {
+            .upload-area {
+                padding: 2.5rem 2rem;
+                max-width: 90%;
+            }
+            
+            .drop-zone {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .drop-zone {
+                padding: 1.5rem;
+            }
+            
+            .file-display {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .file-icon {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            
+            .file-info {
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+            
+            .file-details {
+                justify-content: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .workflow-card {
+                width: 100%;
+            }
+            
+            .form-section {
+                padding: 0 1rem;
+            }
+            
+            .processing-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <nav>
+            <a href="{% url 'index' %}" class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>TranscribeHub</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'index' %}">Home</a>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Upload Your Audio</h1>
+            <p>Get accurate transcriptions with powerful AI tools to extract insights from your meetings and conversations</p>
+        </div>
+    </section>
+
+    <!-- Workflow Section -->
+    <section class="container">
+        <div class="workflow-section">
+            <div class="workflow-card">
+                <div class="workflow-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h3>Upload</h3>
+                <p>Easily upload your audio files from various sources. Support for MP3, WAV, M4A, and FLAC formats. Maximum file size of 500MB.</p>
+            </div>
+            <div class="workflow-card">
+                <div class="workflow-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3>Process</h3>
+                <p>Our advanced AI algorithms analyze your audio, detecting speakers, identifying sentiment, and preparing for accurate transcription.</p>
+            </div>
+            <div class="workflow-card">
+                <div class="workflow-icon">
+                    <i class="fas fa-file-download"></i>
+                </div>
+                <h3>Download</h3>
+                <p>Get your transcription in multiple formats. Export as TXT, DOCX, or PDF with speaker labels and timestamps.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section class="upload-container">
+        <div class="upload-area">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message error">
+                            <i class="fas fa-exclamation-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <form method="POST" enctype="multipart/form-data" id="upload-form">
+                {% csrf_token %}
+                
+                <!-- File Drop Zone -->
+                <div class="drop-zone" id="drop-zone">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h2 class="drop-text">Drop your audio file here</h2>
+                    <p class="browse-text">or click to browse from your computer</p>
+                    <input type="file" name="audio_file" id="file-input" accept="audio/*" style="display: none;" required>
+                </div>
+                
+                <!-- File Display (shown after selection) -->
+                <div class="file-display" id="file-display">
+                    <div class="file-icon">
+                        <i class="fas fa-file-audio"></i>
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name" id="file-name">filename.mp3</div>
+                        <div class="file-details">
+                            <span id="file-size">0 MB</span>
+                            <span id="file-type">audio/mp3</span>
+                        </div>
+                    </div>
+                    <button type="button" class="remove-button" id="remove-file">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="supported-formats">
+                    <div class="format-badge">MP3</div>
+                    <div class="format-badge">WAV</div>
+                    <div class="format-badge">M4A</div>
+                    <div class="format-badge">FLAC</div>
+                </div>
+                
+                <!-- Form Fields -->
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title for your transcription" required>
+                        <p class="help-text">Give your transcription a descriptive name</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description (Optional)</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Add notes or context about this recording"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="participants">Number of Participants</label>
+                        <input type="number" class="form-control" id="participants" name="participants" min="1" max="10" value="1">
+                        <p class="help-text">This helps our AI better identify different speakers</p>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="submit-button" id="submit-button">
+                    <i class="fas fa-play-circle"></i>
+                    Upload & Transcribe
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Processing Overlay -->
+        <div class="processing-overlay" id="processing-overlay">
+            <div class="processing-content">
+                <div class="processing-icon">
+                    <div class="processing-circle"></div>
+                    <div class="processing-wave">
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                    </div>
+                </div>
+                <h3 class="processing-title">Processing Your Audio</h3>
+                <p class="processing-text">Please wait while we transcribe your audio file. This may take a few minutes depending on the file size and length.</p>
+                
+                <div class="processing-progress">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <p class="processing-status" id="processing-status">Uploading your audio file...</p>
+            </div>
+        </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="copyright">© 2025 TranscribeHub. All rights reserved.</div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileDisplay = document.getElementById('file-display');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const fileType = document.getElementById('file-type');
+        const removeFile = document.getElementById('remove-file');
+        const uploadForm = document.getElementById('upload-form');
+        const processingOverlay = document.getElementById('processing-overlay');
+        const processingStatus = document.getElementById('processing-status');
+        const processingProgress = document.getElementById('progress-bar');
+        
+        // Click on drop zone to trigger file input
+        dropZone.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // Handle drag events
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropZone.classList.add('dragging');
+        });
+        
+        dropZone.addEventListener('dragleave', function() {
+            dropZone.classList.remove('dragging');
+        });
+        
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropZone.classList.remove('dragging');
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileDisplay(e.dataTransfer.files[0]);
+            }
+        });
+        
+        // Handle file selection
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length) {
+                updateFileDisplay(fileInput.files[0]);
+            }
+        });
+        
+        // Handle file removal
+        removeFile.addEventListener('click', function() {
+            fileInput.value = '';
+            fileDisplay.style.display = 'none';
+            dropZone.style.display = 'block';
+        });
+        
+        // Update file display
+        function updateFileDisplay(file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileType.textContent = file.type;
+            fileDisplay.style.display = 'flex';
+            dropZone.style.display = 'none';
+        }
+        
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Handle form submission
+        uploadForm.addEventListener('submit', function(e) {
+            if (fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('Please select an audio file to upload.');
+                return;
+            }
+            
+            // Show processing overlay
+            processingOverlay.classList.add('active');
+            
+            // Update processing status periodically
+            let progress = 0;
+            const statusMessages = [
+                "Uploading your audio file...",
+                "Analyzing audio quality...",
+                "Detecting languages and speakers...",
+                "Processing speech patterns...",
+                "Applying AI transcription...",
+                "Generating transcript...",
+                "Adding timestamps...",
+                "Finalizing your transcription..."
+            ];
+            
+            // Simple simulation of progress updates
+            const progressInterval = setInterval(function() {
+                progress += 5;
+                
+                if (progress <= 100) {
+                    processingProgress.style.width = progress + '%';
+                    
+                    // Update status message based on progress
+                    const messageIndex = Math.min(
+                        Math.floor(progress / (100 / statusMessages.length)),
+                        statusMessages.length - 1
+                    );
+                    processingStatus.textContent = statusMessages[messageIndex];
+                } else {
+                    clearInterval(progressInterval);
+                }
+            }, 1500);
+            
+            // Continue with form submission
+            // The page will naturally redirect after form processing
+        });
+    });
+</script>
+</body>
+</html>

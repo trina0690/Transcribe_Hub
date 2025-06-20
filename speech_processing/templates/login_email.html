@@ -1,0 +1,616 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TranscribeHub</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db; /* Vivid Sky Blue */
+            --primary-dark: #1d4e89; /* Rich Deep Blue */
+            --secondary: #00d4ff; /* Electric Cyan */
+            --dark: #0b132b; /* Midnight Blue */
+            --grey: #7f8c8d; /* Muted Blue-Grey */
+            --light-grey: #bdc3c7; /* Cool Fog Blue */
+            --light: #d6dee4; /* Soft Sky Blue */
+            --white: #ffffff;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --bg-color: #f0f4f8;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+        }
+        
+        .logo svg {
+            stroke: var(--primary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+        }
+        
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section - Reimagined */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="none"/><path d="M0 100 Q 50 50, 100 100 T 200 100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/><path d="M0 120 Q 50 70, 100 120 T 200 120" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/><path d="M0 80 Q 50 30, 100 80 T 200 80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/></svg>');
+            background-size: 200px;
+            opacity: 0.7;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.02em;
+        }
+        
+        .hero p {
+            font-size: 1.35rem;
+            opacity: 0.95;
+            max-width: 650px;
+            margin: 0 auto 2rem;
+            line-height: 1.5;
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-feature i {
+            color: var(--secondary);
+        }
+        
+        /* Login Form - Direct integration */
+        .login-form {
+            max-width: 500px;
+            margin: 3rem auto;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .login-form:hover {
+            transform: translateY(-5px);
+        }
+        
+        h2 {
+            color: var(--dark);
+            margin-top: 0;
+            font-size: 1.85rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+        
+        .subtext {
+            color: var(--grey);
+            margin-bottom: 2.2rem;
+            font-size: 1.05rem;
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        input[type="email"] {
+            width: 100%;
+            padding: 1rem 1.2rem 1rem 3rem;
+            border: 2px solid var(--light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: var(--light);
+            box-sizing: border-box;
+        }
+        
+        input[type="email"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.25);
+            background-color: var(--white);
+        }
+        
+        .input-icon-left {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--grey);
+        }
+        
+        .input-hint {
+            display: block;
+            color: var(--grey);
+            font-size: 0.85rem;
+            margin-top: 0.6rem;
+            font-style: italic;
+        }
+        
+        .cta-button {
+            display: block;
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 189, 255, 0.3);
+        }
+        
+        .cta-button:hover {
+            background: linear-gradient(135deg, var(--primary) 30%, var(--secondary) 100%);
+            box-shadow: 0 6px 16px rgba(0, 189, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .cta-button:active {
+            transform: scale(0.98);
+        }
+        
+        .cta-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 0.92rem;
+            margin-top: 1.2rem;
+            padding: 0.9rem;
+            background-color: rgba(231, 76, 60, 0.12);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .success-message {
+            color: var(--success);
+            font-size: 0.92rem;
+            margin-top: 1.2rem;
+            padding: 0.9rem;
+            background-color: rgba(46, 204, 113, 0.12);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 4rem 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            color: var(--grey);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .feature-card p {
+            color: var(--grey);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            padding: 3rem 0 2rem;
+            color: var(--light);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .footer-col h4 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--light-grey);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: var(--light-grey);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                padding: 4rem 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+            
+            .hero-features {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            nav {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                gap: 1.2rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 1rem;
+            }
+            
+            .login-form {
+                padding: 1.8rem;
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
+            
+            .hero {
+                padding: 3rem 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+   <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailForm = document.getElementById('email-form');
+            const sendOtpBtn = document.getElementById('send-otp-btn');
+            
+            // Form submission handler
+            emailForm.addEventListener('submit', function(e) {
+                // Do NOT prevent default form submission - let the form redirect naturally
+                
+                // Show loading state
+                sendOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                sendOtpBtn.disabled = true;
+                
+                // No need to handle redirection manually - the server will handle it
+                // Let the form submit normally to the server
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <nav>
+            <a href="{% url 'index' %}" class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>TranscribeHub</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'index' %}">Home</a>
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Transform Your Meetings Into Actionable Insights</h1>
+            <p>Automatically transcribe, analyze, and summarize meetings with advanced AI. Save time and capture every important detail.</p>
+            
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <i class="fas fa-microphone"></i>
+                    <span>Accurate Transcription</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-users"></i>
+                    <span>Speaker Diarization</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Smart Summaries</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Login Form - Direct integration with page -->
+    <main>
+        <div class="container">
+            <div class="login-form">
+                <h2>Sign in to your account</h2>
+                <p class="subtext">
+                    Access your workspace with your institution credentials
+                </p>
+                <form method="post" action="{% url 'login_email' %}" id="email-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="email">Academic Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon-left"></i>
+                            <input type="email"
+                                id="email"
+                                name="email"
+                                placeholder="you@department.christuniversity.in"
+                                required
+                                pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.christuniversity\.in$"
+                                title="Please use your academic email address like name@dept.christuniversity.in">
+                        </div>
+                        <small class="input-hint">Only emails ending with @dept.christuniversity.in are allowed</small>
+                    </div>
+
+                    <button type="submit" class="cta-button" id="send-otp-btn">
+                        <i class="fas fa-paper-plane"></i> Send OTP Code
+                    </button>
+                </form>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+</body>
+</html>
