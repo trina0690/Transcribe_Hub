@@ -60,5 +60,4 @@ A powerful Django-based web application that transcribes audio, identifies speak
 ### 🔽 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/speaker-statistics-app.git
-cd speaker-statistics-app
+https://github.com/trina0690/Transcribe_Hub.git
